@@ -1,0 +1,1 @@
+"Fatal Error: 'Cannot declare class Test\\SaveUserData\\Observer\\MyObserver, because the name is already in use' in 'C:\\xampp\\htdocs\\magento\\app\\code\\Test\\SaveUserData\\Observer\\SaveUser.php' on line 7"

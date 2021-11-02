@@ -1,0 +1,143 @@
+<style type="text/css">
+    #logisnap-form, #webshop-form{
+        max-width: 300px;
+        margin-bottom: 3rem;
+    }
+
+    #email-input, #password-input{
+        height: 33px;
+        border: 1px solid #E2E2E2;
+        border-radius: 5px;
+        background-color: white;
+        width: 100%;
+    }
+
+    #email-input:focus, #password-input:focus{
+        background-color: white;
+    }
+
+    #login-btn, #webshop-btn{
+        background-color: #00b5c0;
+        color: white;
+        font-weight: bold;
+        height: 33px;
+        border-radius: 5px;
+        border: none;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    #error{
+        color: red;
+        display: none;
+    }
+    
+    #success{
+        color: #32CD32;
+        display: none;
+    }
+
+    #webshop-form{
+        display: none;
+    }
+</style>
+
+<form id="logisnap-form" name="logisnap-form" method="POST" >
+    E-mail: <input id="email-input" type="text" name="email" value=<?= $block->getData('email'); ?> > <br>
+    Password: <input id="password-input" type="password" name="password" value=<?= $block->getData('password'); ?> ><br>
+    <input id="login-btn" type="submit" value="Log In">
+    <p id="error" >Invalid email or password.</p>
+    <p id="success" >Successfully logged in to Logisnap.</p>
+</form>
+
+<form id="webshop-form" name="webshop-form" method="POST" >
+    <p>Select your Webshop:</p>
+    <div id="webshop-list"></div>
+    <input id="webshop-btn" type="submit" value="Save">
+</form>
+
+<script type="text/javascript">
+
+    //trigggered when login btn is clicked and form is submitted
+    require(['jquery'],function(){
+        jQuery(document).ready(function() {
+            jQuery("#logisnap-form").submit(function(){
+                
+                var email = jQuery("input[name='email']").val();
+                var password = jQuery("input[name='password']").val();
+                //getAreaFrontName() = get the admin url
+                var url = "<?php echo $block->getBaseUrl().$this->helper('Magento\Backend\Helper\Data')->getAreaFrontName().'/logisnap/login/login' ?>";
+
+                jQuery.ajax({
+                    url: url,
+                    type: "POST",
+                    data: {email:email, password:password},
+                    showLoader: true,
+                    cache: false,
+                    success: function(response){
+                        //console.log(response);
+                        if(response.logged){
+                            //hide-show feedback to user
+                            jQuery("#error").hide(); 
+                            jQuery("#success").show();
+
+                            //display all available shops linked to this user
+                            var allShops = response.allShops; 
+                            if(allShops.length != 0){
+                                jQuery('#webshop-form #webshop-list').empty();
+                                for (let i = 0; i < allShops.length; i++) {
+                                    jQuery('#webshop-form #webshop-list').append( 
+                                        "<input type='radio' name='webshop' id="+allShops[i].ClientName+" value="+allShops[i].AccountToken+"> <label for="+allShops[i].ClientName+">"+allShops[i].ClientName+"</label><br>"
+                                    );
+                                }
+                                jQuery("#webshop-form").show();
+                            }
+                        }
+                        else{
+                            jQuery("#webshop-form").hide();
+                            jQuery("#error").show(); //display error message if credentials are wrong
+                            jQuery("#success").hide();
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        console.log('Error happens. Try again.');
+                        console.log(errorThrown);
+                    }
+                });
+                return false;
+            });
+        });
+    });
+
+    //trigggered when the user chooses a webshop and click on Save
+    require(['jquery'],function(){
+        jQuery(document).ready(function() {
+            jQuery("#webshop-form").submit(function(){
+                
+                var shopToken = jQuery("input[name='webshop']:checked").val();
+                var email = jQuery("input[name='email']").val();
+                var password = jQuery("input[name='password']").val();
+                var url = "<?php echo $block->getBaseUrl().$this->helper('Magento\Backend\Helper\Data')->getAreaFrontName().'/logisnap/login/selectshop' ?>";
+
+                jQuery.ajax({
+                    url: url,
+                    type: "POST",
+                    data: {email: email, password: password, shopToken: shopToken},
+                    showLoader: true,
+                    cache: false,
+                    success: function(response){
+                        if(response.logged){
+                            jQuery("#webshop-form").hide();
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        console.log('Error happens. Try again.');
+                        console.log(errorThrown);
+                    }
+                });
+                return false;
+            });
+        });
+    });
+
+</script>

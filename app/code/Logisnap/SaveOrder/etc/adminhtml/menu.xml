@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+      <add id="Logisnap_SaveOrder::logisnap" title="Logisnap" translate="title" module="Logisnap_SaveOrder" sortOrder="50" dependsOnModule="Logisnap_SaveOrder" action="logisnap/login" resource="Logisnap_SaveOrder::logisnap"/>
+    </menu>
+</config>
